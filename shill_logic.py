@@ -5,15 +5,12 @@ import random, asyncio, time
 from telethon import TelegramClient, functions, types
 from telethon.sessions import StringSession
 
-# Tu API_ID y API_HASH (los mismos para todas las sesiones)
 API_ID = 25522298
 API_HASH = "42457d764d79db026c9ad7176f0001fd"
 
-# Archivos de configuración
 SESSIONS_FILE = "sesiones.json"
 CONFIG_FILE = "shill_config.json"
 
-# Cargar sesiones de usuario
 with open(SESSIONS_FILE, "r") as f:
     TAG_SESSIONS = json.load(f)
 
@@ -40,10 +37,8 @@ async def seleccionar_respuesta(cliente, remitente, mensajes_previos, last_sende
     if remitente.lower() == "admin":
         if mensajes_previos and mensajes_previos[-1].sender_id != (await cliente.get_me()).id:
             return mensajes_previos[-1].id
-
     if mensajes_previos and remitente != last_sender and random.random() < 0.5:
         return random.choice(mensajes_previos).id
-
     return None
 
 async def simulate_typing(cliente, grupo):
@@ -113,14 +108,13 @@ async def enviar_conversaciones(texto, grupo):
                 if realismo.get('typing', True):
                     await simulate_typing(client, grupo)
                 mensaje_obj = await client.send_message(grupo, mensaje, reply_to=reply_to_id)
-                                await editar_mensaje(client, grupo, mensaje_obj, mensaje, realismo)
+                await editar_mensaje(client, grupo, mensaje_obj, mensaje, realismo)
 
-            me = await client.get_me()
-                 if mensaje_obj.sender_id != me.id:
+                me = await client.get_me()
+                if mensaje_obj.sender_id != me.id:
                     await reaccionar_mensaje(client, grupo, mensaje_obj.id, realismo)
-                    
-                last_sender = tag
 
+                last_sender = tag
                 print(f"✅ Enviado por {tag}")
             except Exception as e:
                 print(f"❌ Error con {tag}: {e}")
