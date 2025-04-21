@@ -40,6 +40,7 @@ GRUPOS_TELEGRAM = {
     "eesee": "@eeseeiochat",
     "earnm": "@earnm_spain",
     "Go": "@gorwachain",
+    "Go2": "@gorwachain_chat2",      
     "Xyro": "@xyro_chat",
     "Man": "@man_token_chat",
     "Runeforce": "@runeforce",
@@ -47,8 +48,8 @@ GRUPOS_TELEGRAM = {
     "Belong": "@chain_atlas",
     "Aro": "@AIResearchOrchestratorgroup",
     "Ladypicasa": "@ladypicasa",
-    "EVAA": "@EvaaProtocolHub",       
-    "Test": "@roofoftoptest"           
+    "EVAA": "@EvaaProtocolHub",
+    "Test": "@roofoftoptest"
 }
 
 @app.route('/admin/sesiones', methods=['GET', 'POST'])
