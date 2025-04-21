@@ -113,8 +113,12 @@ async def enviar_conversaciones(texto, grupo):
                 if realismo.get('typing', True):
                     await simulate_typing(client, grupo)
                 mensaje_obj = await client.send_message(grupo, mensaje, reply_to=reply_to_id)
-                await editar_mensaje(client, grupo, mensaje_obj, mensaje, realismo)
-                await reaccionar_mensaje(client, grupo, mensaje_obj.id, realismo)
+                                await editar_mensaje(client, grupo, mensaje_obj, mensaje, realismo)
+
+            me = await client.get_me()
+                 if mensaje_obj.sender_id != me.id:
+                    await reaccionar_mensaje(client, grupo, mensaje_obj.id, realismo)
+                    
                 last_sender = tag
 
                 print(f"✅ Enviado por {tag}")
