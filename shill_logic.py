@@ -1,3 +1,4 @@
+
 import json
 from datetime import datetime
 import random, asyncio, time
@@ -16,18 +17,6 @@ with open(SESSIONS_FILE, "r") as f:
 async def reaccionar_mensaje(cliente, grupo, message_id, realismo, emoji="👍", big=False):
     print(f"🧪 Intentando reaccionar al mensaje ID {message_id} con {emoji}")
     try:
-        print(f"📋 Tipo de grupo: {type(grupo)}")
-        print(f"📋 Realismo: {realismo}")
-        if realismo.get("reaccionar", True):
-            print("✔️ Reacción activada por configuración.")
-        else:
-            print("⛔ Reacción desactivada por configuración.")
-
-        if random.random() < realismo.get("reaccionar_prob", 0.2):
-            print("🎯 Se cumple la probabilidad para reaccionar.")
-        else:
-            print("🔕 No se cumple la probabilidad.")
-
         if realismo.get("reaccionar", True) and random.random() < realismo.get("reaccionar_prob", 0.2):
             await asyncio.sleep(random.randint(1, 3))
             await cliente(functions.messages.SendReactionRequest(
@@ -106,8 +95,7 @@ async def enviar_conversaciones(texto, grupo):
             print(f"⚠️ No hay sesión para TAG '{tag}', omitiendo...")
 
     if CONFIG.get("shuffle"):
-        from random import shuffle
-        shuffle(mensajes)
+        random.shuffle(mensajes)
 
     last_sender = None
     tiempo_transcurrido = 0
@@ -129,34 +117,25 @@ async def enviar_conversaciones(texto, grupo):
                 await editar_mensaje(client, grupo, mensaje_obj, mensaje, realismo)
 
                 try:
-    me = await client.get_me()
-    print(f"🧾 ID de la cuenta activa (me.id): {me.id}", flush=True)
-
-    if mensajes_previos:
-        mensaje_anterior = mensajes_previos[0]
-        sender_id = getattr(mensaje_anterior, 'sender_id', None)
-        print(f"📤 ID del remitente del mensaje anterior: {sender_id}", flush=True)
-
-        if sender_id and sender_id != me.id:
-            if realismo.get("reaccionar", True):
-                probabilidad = realismo.get("reaccionar_prob", 0.2)
-                aleatorio = random.random()
-                print(f"🎲 Probabilidad configurada: {probabilidad} | Valor aleatorio: {aleatorio}", flush=True)
-                if aleatorio < probabilidad:
-                    print("🔁 Reaccionando a mensaje anterior de otra cuenta", flush=True)
-                    await reaccionar_mensaje(client, grupo, mensaje_anterior.id, realismo)
-                else:
-                    print("💤 No se reaccionó por probabilidad", flush=True)
-            else:
-                print("⚠️ Reacciones desactivadas por configuración", flush=True)
-        else:
-            print("🚫 No se reacciona: el mensaje anterior es propio o inválido", flush=True)
-    else:
-        print("⚠️ No hay mensajes previos para reaccionar", flush=True)
-except Exception as e:
-    print(f"❌ Error inesperado en reacción: {e}", flush=True)
-                else:
-                    print("🚫 No se reacciona: mensaje propio o remitente no válido (sender_id)", flush=True)
+                    me = await client.get_me()
+                    if mensajes_previos:
+                        mensaje_anterior = mensajes_previos[0]
+                        sender_id = getattr(mensaje_anterior, 'sender_id', None)
+                        if sender_id and sender_id != me.id:
+                            if realismo.get("reaccionar", True):
+                                probabilidad = realismo.get("reaccionar_prob", 0.2)
+                                if random.random() < probabilidad:
+                                    await reaccionar_mensaje(client, grupo, mensaje_anterior.id, realismo)
+                                else:
+                                    print("💤 No se reaccionó por probabilidad")
+                            else:
+                                print("⚠️ Reacciones desactivadas por configuración")
+                        else:
+                            print("🚫 No se reacciona: mensaje anterior propio o inválido")
+                    else:
+                        print("⚠️ No hay mensajes previos para reaccionar")
+                except Exception as e:
+                    print(f"❌ Error inesperado en reacción: {e}")
 
                 last_sender = tag
                 print(f"✅ Enviado por {tag}")
