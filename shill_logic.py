@@ -17,14 +17,6 @@ CONFIG_FILE = "shill_config.json"
 with open(SESSIONS_FILE, "r") as f:
     TAG_SESSIONS = json.load(f)
 
-# Cargar configuración actual
-try:
-    with open(CONFIG_FILE, "r", encoding='utf-8') as f:
-        CONFIG = json.load(f)
-except FileNotFoundError:
-    CONFIG = {"delay": 10, "shuffle": True}
-
-realismo = CONFIG.get('realismo', {})
 
 async def reaccionar_mensaje(cliente, grupo, message_id, emoji="👍", big=False):
     if realismo.get("reaccionar", True) and random.random() < realismo.get("reaccionar_prob", 0.2):
@@ -63,6 +55,27 @@ async def simulate_typing(cliente, grupo):
     await asyncio.sleep(random.randint(3, 7))
 
 async def enviar_conversaciones(texto, grupo):
+    try:
+        with open(CONFIG_FILE, "r", encoding='utf-8') as f:
+            CONFIG = json.load(f)
+    except FileNotFoundError:
+        CONFIG = {
+            "delay": 10,
+            "shuffle": True,
+            "realismo": {
+                "typing": True,
+                "responder": True,
+                "editar": True,
+                "editar_prob": 0.1,
+                "reaccionar": True,
+                "reaccionar_prob": 0.2
+            },
+            "duracion_total": 1,
+            "delay_min": 30,
+            "delay_max": 180
+        }
+
+
     realismo = CONFIG.get('realismo', {})
     bloques = texto.strip().split("Session (")
     mensajes = []
