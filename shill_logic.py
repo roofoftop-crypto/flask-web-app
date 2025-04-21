@@ -131,17 +131,14 @@ async def enviar_conversaciones(texto, grupo):
                 me = await client.get_me()
                 print(f"🧾 ID de la cuenta activa (me.id): {me.id}", flush=True)
 
-                sender_id = None
-                if hasattr(mensaje_obj, 'from_id') and isinstance(mensaje_obj.from_id, types.PeerUser):
-                    sender_id = mensaje_obj.from_id.user_id
-
-                print(f"📤 ID del remitente del mensaje: {sender_id}", flush=True)
+                sender_id = getattr(mensaje_obj, 'sender_id', None)
+                print(f"📤 sender_id del mensaje: {sender_id}", flush=True)
 
                 if sender_id and sender_id != me.id:
-                    print("🔁 Reaccionando a mensaje de otra cuenta", flush=True)
+                    print("🔁 Reaccionando a mensaje de otra cuenta (sender_id OK)", flush=True)
                     await reaccionar_mensaje(client, grupo, mensaje_obj.id, realismo)
                 else:
-                    print("🚫 No se reacciona: mensaje propio o remitente no válido", flush=True)
+                    print("🚫 No se reacciona: mensaje propio o remitente no válido (sender_id)", flush=True)
 
                 last_sender = tag
                 print(f"✅ Enviado por {tag}")
