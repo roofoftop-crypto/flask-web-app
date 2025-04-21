@@ -139,7 +139,14 @@ def shill():
     else:
         contadores = {k: 0 for k in GRUPOS_TELEGRAM.keys()}
 
-    return render_template('shill/index.html', proyectos=proyectos, contadores=contadores)
+    
+    tags = []
+    if os.path.exists(SESSIONS_FILE):
+        with open(SESSIONS_FILE, "r", encoding="utf-8") as f:
+            sesiones = json.load(f)
+            tags = list(sesiones.keys())
+
+    return render_template('shill/index.html', proyectos=proyectos, contadores=contadores, tags=tags)
 
 @app.route('/shill/<nombre>', methods=['GET', 'POST'])
 def shill_proyecto(nombre):
