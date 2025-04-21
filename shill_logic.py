@@ -115,8 +115,13 @@ async def enviar_conversaciones(texto, grupo):
                 await editar_mensaje(client, grupo, mensaje_obj, mensaje, realismo)
 
                 me = await client.get_me()
-                from_id = getattr(mensaje_obj.from_id, 'user_id', None)
-                if from_id != me.id:
+
+                if hasattr(mensaje_obj, 'from_id') and isinstance(mensaje_obj.from_id, types.PeerUser):
+                    sender_id = mensaje_obj.from_id.user_id
+                else:
+                    sender_id = None
+
+                if sender_id != me.id:
                     await reaccionar_mensaje(client, grupo, mensaje_obj.id, realismo)
 
                 last_sender = tag
