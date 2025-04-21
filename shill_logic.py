@@ -15,14 +15,19 @@ with open(SESSIONS_FILE, "r") as f:
     TAG_SESSIONS = json.load(f)
 
 async def reaccionar_mensaje(cliente, grupo, message_id, realismo, emoji="👍", big=False):
+    print(f"🧪 Intentando reaccionar al mensaje ID {message_id} con {emoji}")
+    try:
     if realismo.get("reaccionar", True) and random.random() < realismo.get("reaccionar_prob", 0.2):
         await asyncio.sleep(random.randint(1, 3))
-        await cliente(functions.messages.SendReactionRequest(
+                await cliente(functions.messages.SendReactionRequest(
             peer=grupo,
             msg_id=message_id,
             reaction=[types.ReactionEmoji(emoji)],
             big=big
         ))
+        print(f"✅ Reacción enviada al mensaje {message_id}")
+    except Exception as e:
+        print(f"❌ Error al reaccionar al mensaje {message_id}: {e}")
 
 async def editar_mensaje(cliente, grupo, mensaje_obj, texto_original, realismo):
     if texto_original == "STICKER":
