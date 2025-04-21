@@ -1,0 +1,274 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de Gráficos</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 40px 20px;
+        }
+        .contenedor {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 8px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        select {
+            padding: 10px 14px;
+            font-size: 16px;
+            border-radius: 6px;
+            margin: 0 10px 20px 10px;
+            border: 1px solid #ccc;
+        }
+        .bloque {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .bloque h2 {
+            margin-bottom: 10px;
+        }
+        .boton-volver {
+            display: inline-block;
+            margin-top: 40px;
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+<div class="contenedor">
+    <h1>📈 Panel de Gráficos por Proyecto</h1>
+
+    <label for="selectorProyecto">🧠 Proyecto:</label>
+    <select id="selectorProyecto">
+        {% for proyecto in proyectos %}
+            <option value="{{ proyecto }}">{{ proyecto }}</option>
+        {% endfor %}
+    </select>
+
+    <label for="selectorRango">📆 Rango:</label>
+<select id="selectorRango">
+  <option value="7">Últimos 7 días</option>
+  <option value="15">Últimos 15 días</option>
+  <option value="all" selected>Todo</option>
+</select>
+
+<label for="selectorFecha">📅 Fecha:</label>
+    <select id="selectorFecha">
+        {% for fecha in fechas %}
+            <option value="{{ fecha }}">{{ fecha }}</option>
+        {% endfor %}
+    </select>
+
+    
+<div style="margin: 20px auto 10px auto; display: flex; flex-direction: column; align-items: center;">
+    <img id="logoProyecto" src="/static/logo.png" alt="Logo" style="height: 60px; margin-bottom: 10px;" />
+    <div style="display: flex; gap: 15px; justify-content: center;">
+        <div><span style="display:inline-block; width:16px; height:16px; background-color:#6fb1fc; border-radius:3px;"></span> Mañana</div>
+        <div><span style="display:inline-block; width:16px; height:16px; background-color:#ffd56f; border-radius:3px;"></span> Tarde</div>
+        <div><span style="display:inline-block; width:16px; height:16px; background-color:#ff6b6b; border-radius:3px;"></span> Noche</div>
+    </div>
+</div>
+
+<div class="bloque" id="grafico_lineas">
+        <h2>Gráfico de Actividad Diaria</h2>
+        
+<canvas id="graficoLineas" height="350" style="max-width: 850px; margin: 0 auto; display: block;"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const metricas = {{ datos|tojson }};
+    const selectorProyecto = document.getElementById("selectorProyecto");
+    const selectorFecha = document.getElementById("selectorFecha");
+    const ctxLineas = document.getElementById("graficoLineas").getContext("2d");
+    let chartLineas;
+
+    function obtenerDatosProyecto(proyecto) {
+        const fechas = Object.keys(metricas).sort();
+        const datos = [];
+
+        fechas.forEach(fecha => {
+            const dia = metricas[fecha];
+            const info = dia[proyecto];
+            if (info) {
+                datos.push({
+                    fecha: fecha,
+                    total: info["mañana"] + info["tarde"] + info["noche"]
+                });
+            }
+        });
+
+        return datos;
+    }
+
+    function renderLineas() {
+        const proyecto = selectorProyecto.value;
+        const rango = document.getElementById("selectorRango").value;
+        let datos = obtenerDatosProyecto(proyecto);
+        if (rango !== "all") {
+            datos = datos.slice(-parseInt(rango));
+        }
+        const labels = datos.map(e => e.fecha);
+        const valores = datos.map(e => e.total);
+
+        const config = {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Mensajes por Día',
+                    data: valores,
+                    borderColor: '#007bff',
+                    backgroundColor: '#cfe2ff',
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'top' },
+                    title: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Cantidad de Mensajes' }
+                    },
+                    x: {
+                        title: { display: true, text: 'Fecha' }
+                    }
+                }
+            }
+        };
+
+        if (chartLineas) {
+            chartLineas.destroy();
+        }
+
+        chartLineas = new Chart(ctxLineas, config);
+    }
+
+    selectorProyecto.addEventListener("change", renderLineas);
+    selectorProyecto.addEventListener("change", renderLineas);
+    document.getElementById("selectorRango").addEventListener("change", renderLineas);
+    window.onload = renderLineas;
+</script>
+
+    </div>
+
+    <div class="bloque" id="grafico_torta">
+        <h2>Distribución por Turnos</h2>
+        
+<canvas id="graficoTorta" height="240" style="max-width: 500px; margin: 30px auto 0 auto; display: block;"></canvas>
+<script>
+    const ctxTorta = document.getElementById("graficoTorta").getContext("2d");
+    let chartTorta;
+
+    function renderTorta() {
+        const proyecto = selectorProyecto.value;
+        const fecha = selectorFecha.value;
+
+        const turnos = metricas[fecha]?.[proyecto];
+        const manana = turnos?.["mañana"] || 0;
+        const tarde = turnos?.["tarde"] || 0;
+        const noche = turnos?.["noche"] || 0;
+
+        const data = {
+            labels: ["Mañana", "Tarde", "Noche"],
+            datasets: [{
+                data: [manana, tarde, noche],
+                backgroundColor: ["#6fb1fc", "#ffd56f", "#ff6b6b"]
+            }]
+        };
+
+        if (chartTorta) {
+            chartTorta.data = data;
+            chartTorta.update();
+        } else {
+            chartTorta = new Chart(ctxTorta, {
+                type: 'doughnut',
+                data: data,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        title: { display: false }
+                    }
+                }
+            });
+        }
+    }
+
+    selectorProyecto.addEventListener("change", renderTorta);
+    selectorFecha.addEventListener("change", renderTorta);
+    window.onload = () => {
+        renderLineas();
+        renderTorta();
+    };
+</script>
+
+    </div>
+
+    <div class="bloque" id="tabla_detalle">
+        <h2>Tabla de Detalle</h2>
+        
+<table style="width: 100%; max-width: 500px; margin: 30px auto; border-collapse: collapse; background-color: #ffffff; box-shadow: 0 1px 4px rgba(0,0,0,0.1); border-radius: 6px; overflow: hidden;">
+    <thead style="background-color: #f0f0f0;">
+        <tr>
+            <th style="padding: 10px;">Turno</th>
+            <th style="padding: 10px;">Cantidad</th>
+        </tr>
+    </thead>
+    <tbody id="detalleTabla">
+        <tr><td colspan="2" style="padding: 12px;">Cargando datos...</td></tr>
+    </tbody>
+</table>
+
+<script>
+    function renderTabla() {
+        const proyecto = selectorProyecto.value;
+        const fecha = selectorFecha.value;
+        const tbody = document.getElementById("detalleTabla");
+        const turnos = metricas[fecha]?.[proyecto];
+
+        if (!turnos) {
+            tbody.innerHTML = '<tr><td colspan="2" style="padding: 12px;">Sin datos para este día.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = `
+            <tr><td style="padding: 10px;">Mañana</td><td>${turnos["mañana"]}</td></tr>
+            <tr><td style="padding: 10px;">Tarde</td><td>${turnos["tarde"]}</td></tr>
+            <tr><td style="padding: 10px;">Noche</td><td>${turnos["noche"]}</td></tr>
+            <tr style="font-weight: bold;"><td style="padding: 10px;">Total</td><td>${turnos["mañana"] + turnos["tarde"] + turnos["noche"]}</td></tr>
+        `;
+    }
+
+    selectorProyecto.addEventListener("change", renderTabla);
+    selectorFecha.addEventListener("change", renderTabla);
+    window.onload = () => {
+        renderLineas();
+        renderTorta();
+        renderTabla();
+    };
+</script>
+
+    </div>
+
+    <a href="/panel" class="boton-volver">🔙 Volver al Panel</a>
+</div>
+</body>
+</html>

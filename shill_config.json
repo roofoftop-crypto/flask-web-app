@@ -1,0 +1,15 @@
+{
+  "delay": 10,
+  "shuffle": false,
+  "realismo": {
+    "typing": true,
+    "responder": true,
+    "editar": true,
+    "editar_prob": 0.51,
+    "reaccionar": true,
+    "reaccionar_prob": 0.56
+  },
+  "duracion_total": 1,
+  "delay_min": 5,
+  "delay_max": 10
+}

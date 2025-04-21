@@ -1,0 +1,18 @@
+{
+  "admin": {
+    "clave": "4862",
+    "admin": true
+  },
+  "ramj": {
+    "clave": "ramoshillroof",
+    "admin": false
+  },
+  "nicobot": {
+    "clave": "clave321",
+    "admin": false
+  },
+  "marto": {
+    "clave": "1234",
+    "admin": false
+  }
+}
