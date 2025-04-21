@@ -1,4 +1,3 @@
-print("🧨 ESTE CAMBIO ES FORZADO")
 import json
 from datetime import datetime
 import random, asyncio, time
@@ -130,9 +129,17 @@ async def enviar_conversaciones(texto, grupo):
                 await editar_mensaje(client, grupo, mensaje_obj, mensaje, realismo)
 
                 me = await client.get_me()
-                from_id = getattr(mensaje_obj.from_id, 'user_id', None)
-                if from_id != me.id:
-                    await reaccionar_mensaje(client, grupo, mensaje_obj.id, realismo)
+                print(f"🧾 ID de la cuenta activa (me.id): {me.id}")
+
+                if hasattr(mensaje_obj, 'from_id') and isinstance(mensaje_obj.from_id, types.PeerUser):
+                    sender_id = mensaje_obj.from_id.user_id
+                else:
+                    sender_id = None
+
+                print(f"📤 ID del remitente del mensaje: {sender_id}")
+
+                print("🔁 Forzando reaccionar_mensaje para testeo")
+                await reaccionar_mensaje(client, grupo, mensaje_obj.id, realismo)
 
                 last_sender = tag
                 print(f"✅ Enviado por {tag}")
