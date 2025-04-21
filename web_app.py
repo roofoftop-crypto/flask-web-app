@@ -47,7 +47,8 @@ GRUPOS_TELEGRAM = {
     "Belong": "@chain_atlas",
     "Aro": "@AIResearchOrchestratorgroup",
     "Ladypicasa": "@ladypicasa",
-    "Test": "@roofoftoptest",
+    "EVAA": "@EvaaProtocolHub",       
+    "Test": "@roofoftoptest"           
 }
 
 @app.route('/admin/sesiones', methods=['GET', 'POST'])
