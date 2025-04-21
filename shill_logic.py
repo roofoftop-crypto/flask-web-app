@@ -1,3 +1,4 @@
+print("🧨 ESTE CAMBIO ES FORZADO")
 import json
 from datetime import datetime
 import random, asyncio, time
