@@ -143,7 +143,7 @@ async def enviar_conversaciones(texto, grupo):
                         else:
                             print("💤 No se reaccionó por probabilidad", flush=True)
                     else:
-                        print("🚫 No se reacciona: el mensaje anterior es propio o inválido", flush=True)
+                        print("🚫 No se reacciona: el mensaje anterior es propio o inválido (sender_id)", flush=True)
                 else:
                     print("⚠️ No hay mensajes previos para reaccionar", flush=True)
                 else:
