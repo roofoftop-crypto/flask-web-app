@@ -131,12 +131,21 @@ async def enviar_conversaciones(texto, grupo):
                 me = await client.get_me()
                 print(f"🧾 ID de la cuenta activa (me.id): {me.id}", flush=True)
 
-                sender_id = getattr(mensaje_obj, 'sender_id', None)
-                print(f"📤 sender_id del mensaje: {sender_id}", flush=True)
+                if mensajes_previos:
+                    mensaje_anterior = mensajes_previos[0]
+                    sender_id = getattr(mensaje_anterior, 'sender_id', None)
+                    print(f"📤 ID del remitente del mensaje anterior: {sender_id}", flush=True)
 
-                if sender_id and sender_id != me.id:
-                    print("🔁 Reaccionando a mensaje de otra cuenta (sender_id OK)", flush=True)
-                    await reaccionar_mensaje(client, grupo, mensaje_obj.id, realismo)
+                    if sender_id and sender_id != me.id:
+                        if realismo.get("reaccionar", True) and random.random() < realismo.get("reaccionar_prob", 0.2):
+                            print("🔁 Reaccionando a mensaje anterior de otra cuenta", flush=True)
+                            await reaccionar_mensaje(client, grupo, mensaje_anterior.id, realismo)
+                        else:
+                            print("💤 No se reaccionó por probabilidad", flush=True)
+                    else:
+                        print("🚫 No se reacciona: el mensaje anterior es propio o inválido", flush=True)
+                else:
+                    print("⚠️ No hay mensajes previos para reaccionar", flush=True)
                 else:
                     print("🚫 No se reacciona: mensaje propio o remitente no válido (sender_id)", flush=True)
 
