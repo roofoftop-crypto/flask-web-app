@@ -136,24 +136,20 @@ async def enviar_conversaciones(texto, grupo):
                     sender_id = getattr(mensaje_anterior, 'sender_id', None)
                     print(f"📤 ID del remitente del mensaje anterior: {sender_id}", flush=True)
 
-                    reaccionar = False
                     if sender_id and sender_id != me.id:
                         if realismo.get("reaccionar", True):
-                            prob = realismo.get("reaccionar_prob", 0.2)
-                            rand = random.random()
-                            print(f"🎲 Probabilidad configurada: {prob} / Valor aleatorio: {rand}", flush=True)
-                            if rand < prob:
-                                reaccionar = True
+                            probabilidad = realismo.get("reaccionar_prob", 0.2)
+                            aleatorio = random.random()
+                            print(f"🎲 Probabilidad configurada: {probabilidad} | Valor aleatorio: {aleatorio}", flush=True)
+                            if aleatorio < probabilidad:
                                 print("🔁 Reaccionando a mensaje anterior de otra cuenta", flush=True)
+                                await reaccionar_mensaje(client, grupo, mensaje_anterior.id, realismo)
                             else:
                                 print("💤 No se reaccionó por probabilidad", flush=True)
                         else:
                             print("⚠️ Reacciones desactivadas por configuración", flush=True)
                     else:
-                        print("🚫 No se reacciona: el mensaje anterior es propio o inválido (sender_id)", flush=True)
-
-                    if reaccionar:
-                        await reaccionar_mensaje(client, grupo, mensaje_anterior.id, realismo)
+                        print("🚫 No se reacciona: el mensaje anterior es propio o inválido", flush=True)
                 else:
                     print("⚠️ No hay mensajes previos para reaccionar", flush=True)
                 else:
