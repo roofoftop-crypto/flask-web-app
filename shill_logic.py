@@ -16,6 +16,18 @@ with open(SESSIONS_FILE, "r") as f:
 async def reaccionar_mensaje(cliente, grupo, message_id, realismo, emoji="👍", big=False):
     print(f"🧪 Intentando reaccionar al mensaje ID {message_id} con {emoji}")
     try:
+        print(f"📋 Tipo de grupo: {type(grupo)}")
+        print(f"📋 Realismo: {realismo}")
+        if realismo.get("reaccionar", True):
+            print("✔️ Reacción activada por configuración.")
+        else:
+            print("⛔ Reacción desactivada por configuración.")
+
+        if random.random() < realismo.get("reaccionar_prob", 0.2):
+            print("🎯 Se cumple la probabilidad para reaccionar.")
+        else:
+            print("🔕 No se cumple la probabilidad.")
+
         if realismo.get("reaccionar", True) and random.random() < realismo.get("reaccionar_prob", 0.2):
             await asyncio.sleep(random.randint(1, 3))
             await cliente(functions.messages.SendReactionRequest(
@@ -25,6 +37,8 @@ async def reaccionar_mensaje(cliente, grupo, message_id, realismo, emoji="👍",
                 big=big
             ))
             print(f"✅ Reacción enviada al mensaje {message_id}")
+        else:
+            print(f"ℹ️ No se reaccionó al mensaje {message_id}")
     except Exception as e:
         print(f"❌ Error al reaccionar al mensaje {message_id}: {e}")
 
@@ -115,13 +129,8 @@ async def enviar_conversaciones(texto, grupo):
                 await editar_mensaje(client, grupo, mensaje_obj, mensaje, realismo)
 
                 me = await client.get_me()
-
-                if hasattr(mensaje_obj, 'from_id') and isinstance(mensaje_obj.from_id, types.PeerUser):
-                    sender_id = mensaje_obj.from_id.user_id
-                else:
-                    sender_id = None
-
-                if sender_id != me.id:
+                from_id = getattr(mensaje_obj.from_id, 'user_id', None)
+                if from_id != me.id:
                     await reaccionar_mensaje(client, grupo, mensaje_obj.id, realismo)
 
                 last_sender = tag
