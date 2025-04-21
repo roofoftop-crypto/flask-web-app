@@ -17,8 +17,7 @@ CONFIG_FILE = "shill_config.json"
 with open(SESSIONS_FILE, "r") as f:
     TAG_SESSIONS = json.load(f)
 
-
-async def reaccionar_mensaje(cliente, grupo, message_id, emoji="👍", big=False):
+async def reaccionar_mensaje(cliente, grupo, message_id, realismo, emoji="👍", big=False):
     if realismo.get("reaccionar", True) and random.random() < realismo.get("reaccionar_prob", 0.2):
         await asyncio.sleep(random.randint(1, 3))
         await cliente(functions.messages.SendReactionRequest(
@@ -28,7 +27,7 @@ async def reaccionar_mensaje(cliente, grupo, message_id, emoji="👍", big=False
             big=big
         ))
 
-async def editar_mensaje(cliente, grupo, mensaje_obj, texto_original):
+async def editar_mensaje(cliente, grupo, mensaje_obj, texto_original, realismo):
     if texto_original == "STICKER":
         return
     if random.random() < realismo.get('editar_prob', 0.1):
@@ -75,7 +74,6 @@ async def enviar_conversaciones(texto, grupo):
             "delay_max": 180
         }
 
-
     realismo = CONFIG.get('realismo', {})
     bloques = texto.strip().split("Session (")
     mensajes = []
@@ -115,8 +113,8 @@ async def enviar_conversaciones(texto, grupo):
                 if realismo.get('typing', True):
                     await simulate_typing(client, grupo)
                 mensaje_obj = await client.send_message(grupo, mensaje, reply_to=reply_to_id)
-                await editar_mensaje(client, grupo, mensaje_obj, mensaje)
-                await reaccionar_mensaje(client, grupo, mensaje_obj.id)
+                await editar_mensaje(client, grupo, mensaje_obj, mensaje, realismo)
+                await reaccionar_mensaje(client, grupo, mensaje_obj.id, realismo)
                 last_sender = tag
 
                 print(f"✅ Enviado por {tag}")
