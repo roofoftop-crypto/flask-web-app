@@ -163,7 +163,7 @@ def shill_proyecto(nombre):
     if request.method == 'POST':
         texto = request.form['texto']
         try:
-            asyncio.run(enviar_conversaciones(texto, grupo_destino))
+            asyncio.run(enviar_conversaciones(texto, grupo_destino, proyecto=nombre))
             registrar_metricas(texto, nombre)
             estado = f"✅ SHILL enviado al proyecto {nombre}"
 

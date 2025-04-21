@@ -13,9 +13,12 @@ def registrar_metricas(texto, proyecto, ruta_json="metricas_data.json"):
     # Normalizar nombre del proyecto
     proyecto = str(proyecto).strip()
 
-    # Contar cantidad de mensajes válidos en el texto
-    bloques = re.findall(r"Session \(TAG\d+\):\s+(.+?)(?=\nSession|\Z)", texto, flags=re.DOTALL)
-    cantidad = len([msg for msg in bloques if msg.strip() != ""])
+    # Detectar si se trata de un bloque de shill completo o un mensaje individual
+    if isinstance(texto, str) and "Session (TAG" in texto:
+        bloques = re.findall(r"Session \(TAG\d+\):\s+(.+?)(?=\nSession|\Z)", texto, flags=re.DOTALL)
+        cantidad = len([msg for msg in bloques if msg.strip() != ""])
+    else:
+        cantidad = 1 if texto.strip() else 0
 
     if cantidad == 0:
         print(f"[❌ MÉTRICAS] No se registran mensajes para '{proyecto}', texto vacío o mal formado.")
