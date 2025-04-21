@@ -128,30 +128,33 @@ async def enviar_conversaciones(texto, grupo):
                 mensaje_obj = await client.send_message(grupo, mensaje, reply_to=reply_to_id)
                 await editar_mensaje(client, grupo, mensaje_obj, mensaje, realismo)
 
-                me = await client.get_me()
-print(f"🧾 ID de la cuenta activa (me.id): {me.id}", flush=True)
+                try:
+    me = await client.get_me()
+    print(f"🧾 ID de la cuenta activa (me.id): {me.id}", flush=True)
 
-if mensajes_previos:
-    mensaje_anterior = mensajes_previos[0]
-    sender_id = getattr(mensaje_anterior, 'sender_id', None)
-    print(f"📤 ID del remitente del mensaje anterior: {sender_id}", flush=True)
+    if mensajes_previos:
+        mensaje_anterior = mensajes_previos[0]
+        sender_id = getattr(mensaje_anterior, 'sender_id', None)
+        print(f"📤 ID del remitente del mensaje anterior: {sender_id}", flush=True)
 
-    if sender_id and sender_id != me.id:
-        if realismo.get("reaccionar", True):
-            probabilidad = realismo.get("reaccionar_prob", 0.2)
-            aleatorio = random.random()
-            print(f"🎲 Probabilidad configurada: {probabilidad} | Valor aleatorio: {aleatorio}", flush=True)
-            if aleatorio < probabilidad:
-                print("🔁 Reaccionando a mensaje anterior de otra cuenta", flush=True)
-                await reaccionar_mensaje(client, grupo, mensaje_anterior.id, realismo)
+        if sender_id and sender_id != me.id:
+            if realismo.get("reaccionar", True):
+                probabilidad = realismo.get("reaccionar_prob", 0.2)
+                aleatorio = random.random()
+                print(f"🎲 Probabilidad configurada: {probabilidad} | Valor aleatorio: {aleatorio}", flush=True)
+                if aleatorio < probabilidad:
+                    print("🔁 Reaccionando a mensaje anterior de otra cuenta", flush=True)
+                    await reaccionar_mensaje(client, grupo, mensaje_anterior.id, realismo)
+                else:
+                    print("💤 No se reaccionó por probabilidad", flush=True)
             else:
-                print("💤 No se reaccionó por probabilidad", flush=True)
+                print("⚠️ Reacciones desactivadas por configuración", flush=True)
         else:
-            print("⚠️ Reacciones desactivadas por configuración", flush=True)
+            print("🚫 No se reacciona: el mensaje anterior es propio o inválido", flush=True)
     else:
-        print("🚫 No se reacciona: el mensaje anterior es propio o inválido", flush=True)
-else:
-    print("⚠️ No hay mensajes previos para reaccionar", flush=True)
+        print("⚠️ No hay mensajes previos para reaccionar", flush=True)
+except Exception as e:
+    print(f"❌ Error inesperado en reacción: {e}", flush=True)
                 else:
                     print("🚫 No se reacciona: mensaje propio o remitente no válido (sender_id)", flush=True)
 
