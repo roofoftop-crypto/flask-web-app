@@ -77,6 +77,21 @@ body {
 </div>
 <button class="btn btn-dark w-100" type="submit">Entrar</button>
 </form>
+
+{% if sesiones %}
+<div class="mt-4 text-start">
+  <strong>🟢 Sesiones activas:</strong>
+  <ul class="list-group list-group-flush small">
+    {% for usuario, fecha in sesiones.items() %}
+    <li class="list-group-item d-flex justify-content-between">
+      <span>{{ usuario }}</span>
+      <span class="text-muted">{{ fecha }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
 </div>
 </body>
 </html>

@@ -102,6 +102,15 @@ def administrar_sesiones():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    import datetime
+
+    USUARIOS_SESIONES_FILE = "usuarios_activos.json"
+    usuarios_activos = {}
+
+    if os.path.exists(USUARIOS_SESIONES_FILE):
+        with open(USUARIOS_SESIONES_FILE, "r", encoding="utf-8") as f:
+            usuarios_activos = json.load(f)
+
     with open("usuarios.json", "r", encoding="utf-8") as f:
         usuarios = json.load(f)
 
@@ -111,9 +120,14 @@ def login():
         
         if usuario in usuarios and usuarios[usuario]["clave"] == clave:
             session['usuario'] = usuario
+            usuarios_activos[usuario] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            with open(USUARIOS_SESIONES_FILE, "w", encoding="utf-8") as f:
+                json.dump(usuarios_activos, f, indent=2)
             return redirect(url_for('panel'))
-        return render_template('login.html', error="Credenciales inválidas")
-    return render_template('login.html')
+
+        return render_template('login.html', error="Credenciales inválidas", sesiones=usuarios_activos)
+
+    return render_template('login.html', sesiones=usuarios_activos)
 
 @app.route('/panel')
 def panel():
