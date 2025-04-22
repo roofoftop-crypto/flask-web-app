@@ -1,22 +1,6 @@
 {
-  "admin": {
-    "clave": "4862",
-    "admin": true
-  },
-  "ramj": {
-    "clave": "ramoshillroof",
-    "admin": true
-  },
-  "nicobot": {
-    "clave": "clave321",
-    "admin": false
-  },
-  "pablito": {
-    "clave": "1234",
-    "admin": false
-  },
-  "marto": {
-    "clave": "1234",
-    "admin": false
-  }
+  "admin": { "clave": "4862", "admin": true },
+  "ramo": { "clave": "ramoshillroof", "admin": true },
+  "pablito": { "clave": "1234", "admin": false },
+  "marto": { "clave": "1234", "admin": false }
 }
