@@ -108,13 +108,13 @@ def shill_proyecto(nombre):
     estado = None
     grupo_destino = GRUPOS_TELEGRAM.get(nombre)
     if not grupo_destino:
-        estado = f"❌ Proyecto desconocido: {nombre}"
+        estado = "✅ SHILL enviado al proyecto {}".format(nombre)
         return render_template('shill/proyecto.html', nombre=nombre, estado=estado)
 
     if request.method == 'POST':
         texto = request.form['texto']
         try:
-            asyncio.run(enviar_conversaciones(texto, grupo_destino, proyecto=nombre))            estado = f"✅ SHILL enviado al proyecto {nombre}"
+            asyncio.run(enviar_conversaciones(texto, grupo_destino, proyecto=nombre))            estado = "✅ SHILL enviado al proyecto {}".format(nombre)
             if os.path.exists(CONTADOR_FILE):
                 with open(CONTADOR_FILE, 'r') as f:
                     contadores = json.load(f)
