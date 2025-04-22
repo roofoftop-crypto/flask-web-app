@@ -1,19 +1,23 @@
 
 import json
 import re
+import os
 from datetime import datetime
 
 # Lista fija de proyectos conocidos
 PROYECTOS_VALIDOS = [
-    "Futureverse", "eesee", "earnm", "Go", "Xyro", "Man", "Runeforce",
-    "Xatoms", "Belong", "Aro", "Ladypicasa", "Test"
+    "Futureverse", "eesee", "earnm", "Go", "Go2", "Xyro", "Man", "Runeforce",
+    "Xatoms", "Belong", "Aro", "Ladypicasa", "EVAA", "Test"
 ]
 
-def registrar_metricas(texto, proyecto, ruta_json="metricas_data.json"):
+def registrar_metricas(texto, proyecto, ruta_json="data/metricas_data.json"):
+    # Asegurar que la carpeta data exista
+    os.makedirs(os.path.dirname(ruta_json), exist_ok=True)
+
     # Normalizar nombre del proyecto
     proyecto = str(proyecto).strip()
 
-    # Detectar si se trata de un bloque de shill completo o un mensaje individual
+    # Detectar si es un mensaje individual o un bloque
     if isinstance(texto, str) and "Session (TAG" in texto:
         bloques = re.findall(r"Session \(TAG\d+\):\s+(.+?)(?=\nSession|\Z)", texto, flags=re.DOTALL)
         cantidad = len([msg for msg in bloques if msg.strip() != ""])
@@ -34,7 +38,7 @@ def registrar_metricas(texto, proyecto, ruta_json="metricas_data.json"):
     else:
         turno = "noche"
 
-    # Cargar archivo JSON existente o iniciar estructura
+    # Cargar archivo o inicializar estructura
     try:
         with open(ruta_json, "r", encoding="utf-8") as f:
             metricas = json.load(f)
@@ -45,22 +49,22 @@ def registrar_metricas(texto, proyecto, ruta_json="metricas_data.json"):
     if fecha_actual not in metricas:
         metricas[fecha_actual] = {}
 
-    # Inicializar todos los proyectos para la fecha
+    # Inicializar todos los proyectos
     for proj in PROYECTOS_VALIDOS:
         if proj not in metricas[fecha_actual]:
             metricas[fecha_actual][proj] = {"mañana": 0, "tarde": 0, "noche": 0}
 
-    # Sumar los mensajes
+    # Sumar mensajes
     if proyecto in metricas[fecha_actual]:
         metricas[fecha_actual][proyecto][turno] += cantidad
     else:
         print(f"[⚠️ MÉTRICAS] Proyecto '{proyecto}' no está en la lista de válidos.")
 
-    # Guardar archivo
+    # Guardar
     with open(ruta_json, "w", encoding="utf-8") as f:
         json.dump(metricas, f, indent=2, ensure_ascii=False)
 
-    print(f"[📊 MÉTRICAS] Registrados {cantidad} mensajes en {proyecto} | {fecha_actual} ({turno})")
+    print(f"[📊 MÉTRICAS] +{cantidad} mensaje(s) en {proyecto} | {fecha_actual} ({turno})")
     return {
         "fecha": fecha_actual,
         "turno": turno,
