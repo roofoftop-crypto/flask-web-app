@@ -304,10 +304,10 @@ def metricas():
     from datetime import datetime
     fecha_actual = datetime.now().strftime("%Y-%m-%d")
 
-    if not os.path.exists("metricas_data.json"):
+    if not os.path.exists("data/metricas_data.json"):
         datos = {}
     else:
-        with open("metricas_data.json", "r", encoding="utf-8") as f:
+        with open("data/metricas_data.json", "r", encoding="utf-8") as f:
             datos = json.load(f)
 
     return render_template("metricas.html", datos=datos, fecha_actual=fecha_actual)
@@ -316,10 +316,10 @@ def metricas():
 def graficos():
     import os, json
 
-    if not os.path.exists("metricas_data.json"):
+    if not os.path.exists("data/metricas_data.json"):
         datos = {}
     else:
-        with open("metricas_data.json", "r", encoding="utf-8") as f:
+        with open("data/metricas_data.json", "r", encoding="utf-8") as f:
             datos = json.load(f)
 
     # Extraer lista de proyectos únicos y fechas
