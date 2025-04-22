@@ -114,9 +114,7 @@ def shill_proyecto(nombre):
     if request.method == 'POST':
         texto = request.form['texto']
         try:
-            asyncio.run(enviar_conversaciones(texto, grupo_destino, proyecto=nombre))
-            registrar_metricas(texto, nombre)
-            estado = f"✅ SHILL enviado al proyecto {nombre}"
+            asyncio.run(enviar_conversaciones(texto, grupo_destino, proyecto=nombre))            estado = f"✅ SHILL enviado al proyecto {nombre}"
             if os.path.exists(CONTADOR_FILE):
                 with open(CONTADOR_FILE, 'r') as f:
                     contadores = json.load(f)

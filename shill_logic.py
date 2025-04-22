@@ -35,7 +35,7 @@ async def editar_mensaje(cliente, grupo, mensaje_obj, texto_original, realismo):
         await asyncio.sleep(random.randint(2, 5))
         variaciones = ["!", " 🤔", " lol", " 🙌"]
         nuevo = texto_original + random.choice(variaciones)
-        await client.edit_message(grupo, mensaje_obj.id, nuevo)
+        await cliente.edit_message(grupo, mensaje_obj.id, nuevo)
 
 async def seleccionar_respuesta(cliente, remitente, mensajes_previos, last_sender):
     if remitente.lower() == "admin":
