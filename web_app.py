@@ -182,15 +182,24 @@ def config_shill():
                            reaccionar_prob=reaccionar_prob, duracion_total=config.get('duracion_total', 1),
                            delay_min=config.get('delay_min', 30), delay_max=config.get('delay_max', 180))
 
+
 @app.route('/metricas')
 def metricas():
     fecha_actual = datetime.now().strftime("%Y-%m-%d")
-    if not os.path.exists("data/metricas_data.json"):
-        datos = {}
-    else:
-        with open("data/metricas_data.json", "r", encoding="utf-8") as f:
-            datos = json.load(f)
+    ruta_metricas = "data/metricas_data.json"
+    datos = {}
+
+    if os.path.exists(ruta_metricas):
+        try:
+            with open(ruta_metricas, "r", encoding="utf-8") as f:
+                contenido = f.read().strip()
+                if contenido:
+                    datos = json.loads(contenido)
+        except Exception as e:
+            print(f"[❌ ERROR MÉTRICAS] No se pudo leer el archivo: {e}")
+
     return render_template("metricas.html", datos=datos, fecha_actual=fecha_actual)
+
 
 @app.route('/graficos')
 def graficos():
