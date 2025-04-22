@@ -52,10 +52,13 @@ async def verificar_sesiones(sesiones):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    usuarios_activos = {}
-    if os.path.exists(USUARIOS_SESIONES_FILE):
+    try:
         with open(USUARIOS_SESIONES_FILE, "r", encoding="utf-8") as f:
             usuarios_activos = json.load(f)
+            if not isinstance(usuarios_activos, dict):
+                usuarios_activos = {}
+    except Exception:
+        usuarios_activos = {}
 
     with open(USERS_FILE, "r", encoding="utf-8") as f:
         usuarios = json.load(f)
