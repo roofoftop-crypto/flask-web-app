@@ -241,10 +241,68 @@ def logout():
     return redirect(url_for('login'))
 
 
+,
+        delay_min=config.get('delay_min', 30),
+        delay_max=config.get('delay_max', 180)
+    )
+
+
+@app.route('/metricas')
+def metricas():
+    from datetime import datetime
+    fecha_actual = datetime.now().strftime("%Y-%m-%d")
+
+    if not os.path.exists("data/metricas_data.json"):
+        datos = {}
+    else:
+        with open("data/metricas_data.json", "r", encoding="utf-8") as f:
+            datos = json.load(f)
+
+    return render_template("metricas.html", datos=datos, fecha_actual=fecha_actual)
+
+@app.route('/graficos')
+def graficos():
+    import os, json
+
+    if not os.path.exists("data/metricas_data.json"):
+        datos = {}
+    else:
+        with open("data/metricas_data.json", "r", encoding="utf-8") as f:
+            datos = json.load(f)
+
+    # Extraer lista de proyectos únicos y fechas
+    proyectos = set()
+    fechas = list(datos.keys())
+    for dia in datos.values():
+        proyectos.update(dia.keys())
+
+    proyectos = sorted(list(proyectos))
+    fechas = sorted(fechas)
+
+    return render_template("graficos.html", datos=datos, proyectos=proyectos, fechas=fechas)
+
+
+
+
+    
+
+import os
+
+if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
+
+
 @app.route('/shill/config', methods=['GET', 'POST'])
 def config_shill():
-    if 'usuario' not in session or session['usuario'] != 'admin':
+    if 'usuario' not in session:
         return redirect(url_for('login'))
+
+    with open("usuarios.json", "r", encoding="utf-8") as f:
+        usuarios = json.load(f)
+
+    if not usuarios.get(session['usuario'], {}).get("admin", False):
+        return redirect(url_for('panel'))
 
     config = {
         "delay": 10,
@@ -297,50 +355,3 @@ def config_shill():
         delay_min=config.get('delay_min', 30),
         delay_max=config.get('delay_max', 180)
     )
-
-
-@app.route('/metricas')
-def metricas():
-    from datetime import datetime
-    fecha_actual = datetime.now().strftime("%Y-%m-%d")
-
-    if not os.path.exists("data/metricas_data.json"):
-        datos = {}
-    else:
-        with open("data/metricas_data.json", "r", encoding="utf-8") as f:
-            datos = json.load(f)
-
-    return render_template("metricas.html", datos=datos, fecha_actual=fecha_actual)
-
-@app.route('/graficos')
-def graficos():
-    import os, json
-
-    if not os.path.exists("data/metricas_data.json"):
-        datos = {}
-    else:
-        with open("data/metricas_data.json", "r", encoding="utf-8") as f:
-            datos = json.load(f)
-
-    # Extraer lista de proyectos únicos y fechas
-    proyectos = set()
-    fechas = list(datos.keys())
-    for dia in datos.values():
-        proyectos.update(dia.keys())
-
-    proyectos = sorted(list(proyectos))
-    fechas = sorted(fechas)
-
-    return render_template("graficos.html", datos=datos, proyectos=proyectos, fechas=fechas)
-
-
-
-
-    
-
-import os
-
-if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
-
