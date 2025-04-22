@@ -182,10 +182,19 @@ def config_shill():
                            reaccionar_prob=reaccionar_prob, duracion_total=config.get('duracion_total', 1),
                            delay_min=config.get('delay_min', 30), delay_max=config.get('delay_max', 180))
 
-
 @app.route('/metricas')
 def metricas():
     fecha_actual = datetime.now().strftime("%Y-%m-%d")
+    if not os.path.exists("data/metricas_data.json"):
+        datos = {}
+    else:
+        with open("data/metricas_data.json", "r", encoding="utf-8") as f:
+            datos = json.load(f)
+    return render_template("metricas.html", datos=datos, fecha_actual=fecha_actual)
+
+
+@app.route('/graficos')
+def graficos():
     ruta_metricas = "data/metricas_data.json"
     datos = {}
 
@@ -196,21 +205,12 @@ def metricas():
                 if contenido:
                     datos = json.loads(contenido)
         except Exception as e:
-            print(f"[❌ ERROR MÉTRICAS] No se pudo leer el archivo: {e}")
+            print(f"[❌ ERROR GRÁFICOS] No se pudo leer el archivo: {e}")
 
-    return render_template("metricas.html", datos=datos, fecha_actual=fecha_actual)
-
-
-@app.route('/graficos')
-def graficos():
-    if not os.path.exists("data/metricas_data.json"):
-        datos = {}
-    else:
-        with open("data/metricas_data.json", "r", encoding="utf-8") as f:
-            datos = json.load(f)
-    proyectos = sorted({proj for dia in datos.values() for proj in dia.keys()})
-    fechas = sorted(datos.keys())
+    proyectos = sorted({proj for dia in datos.values() for proj in dia.keys()}) if datos else []
+    fechas = sorted(datos.keys()) if datos else []
     return render_template("graficos.html", datos=datos, proyectos=proyectos, fechas=fechas)
+
 
 @app.route('/logout')
 def logout():
