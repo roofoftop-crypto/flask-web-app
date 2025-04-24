@@ -37,10 +37,14 @@ async def editar_mensaje(cliente, grupo, mensaje_obj, texto_original, realismo):
         nuevo = texto_original + random.choice(variaciones)
         await cliente.edit_message(grupo, mensaje_obj.id, nuevo)
 
-async def seleccionar_respuesta(cliente, remitente, mensajes_previos, last_sender):
-    # Siempre intenta responder al último mensaje si cumple condiciones
-    if mensajes_previos and remitente != last_sender and random.random() < 0.5:
-        return mensajes_previos[-1].id  # Último mensaje antes del actual
+async def seleccionar_respuesta(cliente, remitente, mensajes_previos, last_sender, grupo):
+    # Obtener el último mensaje público en el grupo
+    try:
+        mensajes = await cliente.get_messages(grupo, limit=1)
+        if mensajes and random.random() < 0.5:
+            return mensajes[0].id  # Responder al último mensaje sin importar remitente
+    except Exception as e:
+        print(f"Error al obtener el último mensaje para responder: {e}")
     return None
 
 async def simulate_typing(cliente, grupo):
