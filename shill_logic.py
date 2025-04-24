@@ -39,7 +39,7 @@ async def editar_mensaje(cliente, grupo, mensaje_obj, texto_original, realismo):
 
 async def seleccionar_respuesta(cliente, remitente, mensajes_previos, last_sender):
     try:
-        if mensajes_previos:
+        if mensajes_previos and random.random() < 0.7:
             grupo = mensajes_previos[0].peer_id
             mensajes = await cliente.get_messages(grupo, limit=1)
             if mensajes:
