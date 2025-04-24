@@ -38,11 +38,12 @@ async def editar_mensaje(cliente, grupo, mensaje_obj, texto_original, realismo):
         await cliente.edit_message(grupo, mensaje_obj.id, nuevo)
 
 async def seleccionar_respuesta(cliente, remitente, mensajes_previos, last_sender):
-    if remitente.lower() == "admin":
-        if mensajes_previos and mensajes_previos[-1].sender_id != (await cliente.get_me()).id:
-            return mensajes_previos[-1].id
-    if mensajes_previos and remitente != last_sender and random.random() < 0.5:
-        return random.choice(mensajes_previos).id
+    # Limitar a los últimos 5 mensajes como máximo
+    mensajes_candidatos = mensajes_previos[-5:]
+
+    # Si hay al menos 2 mensajes y se decide responder, se responde al anterior inmediato
+    if len(mensajes_candidatos) >= 2 and remitente != last_sender and random.random() < 0.5:
+        return mensajes_candidatos[-2].id  # mensaje anterior
     return None
 
 async def simulate_typing(cliente, grupo):
