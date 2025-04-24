@@ -37,12 +37,14 @@ async def editar_mensaje(cliente, grupo, mensaje_obj, texto_original, realismo):
         nuevo = texto_original + random.choice(variaciones)
         await cliente.edit_message(grupo, mensaje_obj.id, nuevo)
 
-async def seleccionar_respuesta(cliente, remitente, mensajes_previos, last_sender, grupo):
+async def seleccionar_respuesta(cliente, remitente, mensajes_previos, last_sender):
     try:
-        mensajes = await cliente.get_messages(grupo, limit=1)
-        if mensajes:
-            print(f"➡️ Respondiendo al mensaje ID: {mensajes[0].id} | Texto: {mensajes[0].text[:30]}")
-            return mensajes[0].id
+        if mensajes_previos:
+            grupo = mensajes_previos[0].peer_id
+            mensajes = await cliente.get_messages(grupo, limit=1)
+            if mensajes:
+                print(f"➡️ Respondiendo al mensaje ID: {mensajes[0].id} | Texto: {mensajes[0].text[:30]}")
+                return mensajes[0].id
     except Exception as e:
         print(f"❌ Error al obtener el último mensaje para responder: {e}")
     return None
